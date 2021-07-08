@@ -68,13 +68,15 @@ public class Assignment2 {
 	 */
 	public boolean disconnectDB() {
 		boolean successful = false;
-		try  {
-		  this.connection.close();
-		  successful = true;
-		} catch (SQLException e) {
-		  System.out.println("Error, could not close db connection");
+		if (connection != null) {
+			try  {
+				this.connection.close();
+			  } catch (SQLException e) {
+				System.out.println("Error, could not close db connection");
+				return false;
+			  }
 		}
-		return successful;
+		return true;
 	}
 
 	/*
