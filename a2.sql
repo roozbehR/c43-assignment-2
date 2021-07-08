@@ -146,7 +146,61 @@ DROP VIEW studentGradeInfo;
 DROP VIEW deptmaxavg;
 
 --Query 6
-INSERT INTO query6
+
+-- Get all student courses taken with their corresponding sections
+CREATE VIEW coursesectionstaken AS (
+    SELECT sc.sid, cs.cid, cs.dcode, cs.csid, cs.year, cs.semester
+    FROM studentcourse sc
+    INNER JOIN coursesection cs
+    ON sc.csid = cs.csid
+);
+
+-- Get all student courses taken with an entry for each corresponding prerequisite
+CREATE VIEW studentscourseprereqs AS (
+    SELECT cst.sid, cst.dcode, cst.cid, cst.year, cst.semester, p.pdcode, p.pcid
+    FROM coursesectionstaken cst
+    INNER JOIN prerequisites p
+    ON cst.dcode = p.dcode AND cst.cid = p.cid
+);
+
+-- Get all student courses taken with a count of how many prerequisites each has
+CREATE VIEW studentscourseprereqscount AS (
+    SELECT scpr.sid, scpr.dcode, scpr.cid, scpr.year, scpr.semester, COUNT(*) AS numofprerequisites
+    FROM studentscourseprereqs scpr
+    GROUP BY scpr.sid, scpr.dcode, scpr.cid, scpr.year, scpr.semester
+);
+
+-- Get all student courses taken with a count of how many prerequisites of each were taken by the same student at a prior time
+CREATE VIEW studentscourseprereqstakencount AS (
+    SELECT scpr.sid, scpr.dcode, scpr.cid, scpr.year, scpr.semester, COUNT(*) AS numofprerequisites
+    FROM studentscourseprereqs scpr
+    INNER JOIN coursesectionstaken cst
+    ON scpr.sid = cst.sid AND scpr.pdcode = cst.dcode AND scpr.pcid = cst.cid
+    WHERE cst.year < scpr.year OR cst.year = scpr.year AND cst.semester < scpr.semester
+    GROUP BY scpr.sid, scpr.dcode, scpr.cid, scpr.year, scpr.semester
+);
+
+-- Get the student courses taken with prerequisite count equal to number of prerequisites completed count
+CREATE VIEW studentcourseswithprereqstaken AS (
+    (SELECT * FROM studentscourseprereqscount)
+    INTERSECT
+    (SELECT * FROM studentscourseprereqstakencount)
+);
+
+INSERT INTO query6 (
+    SELECT s.sfirstname AS fname, s.slastname AS lname, c.cname, scpt.year, scpt.semester
+    FROM studentcourseswithprereqstaken scpt
+    INNER JOIN student s
+    ON scpt.sid = s.sid
+    INNER JOIN course c
+    ON scpt.dcode = c.dcode AND scpt.cid = c.cid
+);
+
+DROP VIEW coursesectionstaken;
+DROP VIEW studentscourseprereqs;
+DROP VIEW studentscourseprereqscount;
+DROP VIEW studentscourseprereqstakencount;
+DROP VIEW studentcourseswithprereqstaken;
 
 --Query 7
 
