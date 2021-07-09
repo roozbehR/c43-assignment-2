@@ -124,7 +124,25 @@ public class Assignment2 {
 	 * department does not exist.
 	 */
 	public int getStudentsCount(String dname) {
-		throw new RuntimeException("Function Not Implemented");
+        int answer = 0;
+        PreparedStatement st=null;
+        ResultSet result = null;
+        String query = "";
+        
+		try {
+			query = "SELECT count(sid) FROM student, department WHERE student.dcode = department.dcode AND department.dname=?";
+	   		st = connection.prepareStatement(query);
+	   		st.setString(1, dname);		
+	   		result = st.executeQuery();
+	   		while(result.next()) {
+	   			answer = result.getInt("count");
+	   		}
+	   		return answer;
+    	   
+       }catch(SQLException e) {
+    	   System.out.println(e.getMessage());
+    	   return -1;
+       }
 	}
 
 	/*
@@ -164,7 +182,22 @@ public class Assignment2 {
 	 * otherwise.
 	 */
 	public boolean deleteDept(String dcode) {
-		throw new RuntimeException("Function Not Implemented");
+        PreparedStatement st=null;
+        String query = "";
+        
+		try {
+			query = "DELETE FROM department WHERE dcode=?";
+	   		st = connection.prepareStatement(query);
+	   		st.setString(1, dcode);		
+	   		int rowsAffected = st.executeUpdate();
+	   		if(rowsAffected == 0) {
+	   			return false;
+	   		}
+			return true;
+		}catch(SQLException e) {
+			System.out.println(e.getMessage());
+			return false;
+		}
 	}
 
 	/*
@@ -202,7 +235,45 @@ public class Assignment2 {
 	 * true if the database was successfully created, false otherwise.
 	 */
 	public boolean updateDB() {
-		throw new RuntimeException("Function Not Implemented");
+		PreparedStatement st=null;
+        String query = "";
+        String query1 = "";
+		ResultSet result = null;
+		
+        try {
+			query1="SELECT sid, sfirstname, slastname "
+					+ "FROM student, department "
+					+ "WHERE student.dcode = department.dcode AND "
+					+ "sex=? AND dname=? AND yearofstudy=?";
+	   		st = connection.prepareStatement(query1);
+	   		st.setString(1, "F");	
+	   		st.setString(2, "Computer Science");
+	   		st.setInt(3, 8);
+	   		result = st.executeQuery();
+	   		
+			query = "CREATE TABLE femaleStudents(sid INTEGER, fname CHAR(20), lname CHAR(20)"
+					+ ")";
+	   		st = connection.prepareStatement(query);
+	   		int returnval = st.executeUpdate();
+	   		
+	   		while(result.next()) {
+	   			System.out.println("Sid: "+ result.getInt("sid")+" Fname: "+ result.getString("sfirstname"));
+	   			query = "INSERT INTO femaleStudents VALUES (?, ?, ?)";
+	   			st = connection.prepareStatement(query);
+		   		st.setInt(1, result.getInt("sid"));
+		   		st.setString(2, result.getString("sfirstname"));
+		   		st.setString(3, result.getString("slastname"));
+	   			int inserted = st.executeUpdate();
+	   			if(inserted != 1) {
+	   				return false;
+	   			}
+	   		}
+	   		return true;
+	   		
+		}catch(SQLException e) {
+			System.out.println(e.getMessage());
+			return false;
+		}
 	}
 	
 	public static void main(String[] args) {
