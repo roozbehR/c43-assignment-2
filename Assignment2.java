@@ -116,7 +116,46 @@ public class Assignment2 {
 	 */
 	public boolean insertStudent(int sid, String lastName, String firstName,
 			String sex, int age, String dcode, int yearOfStudy) {
-		throw new RuntimeException("Function Not Implemented");
+	  if (!isStudentAttrValid(dcode, sex, yearOfStudy)) return false;
+	  
+	   String sqlQ = "INSERT INTO student VALUES (?,?,?,?,?,?,?)";
+	   PreparedStatement st = null;
+	   
+	   try {
+	     st = connection.prepareStatement(sqlQ);
+	     st.setInt(1, sid);
+	     st.setNString(2, lastName);
+	     st.setNString(3, firstName);
+	     st.setNString(4, sex);
+	     st.setInt(5, age);
+	     st.setNString(6, dcode);
+	     st.setInt(7, yearOfStudy);
+	     st.executeUpdate();
+	   } catch(SQLException e) {
+	     System.out.println(e.getMessage());
+	     return false;
+	   }
+	   return true;
+	}
+	
+	private boolean isStudentAttrValid(String dcode, String sex, int yearOfStudy) {
+	  String sqlQ = "SELECT dcode FROM department", dcodeInDB = "";
+      PreparedStatement st = null;
+      ResultSet result = null;
+      
+	  try {
+	    st = connection.prepareStatement(sqlQ);
+	    result = st.executeQuery();
+	    while(result.next()) {
+	      String curr = result.getString("dcode");
+	      if (curr.equals(dcode)) dcodeInDB = curr;
+	    }
+	  } catch(SQLException e) {
+	    System.out.println(e.getMessage());
+	    return false;
+	  }
+	  return dcodeInDB.equals(dcode) && (sex.equals("M") || sex.equals("F")) && 
+	      yearOfStudy > 0 && yearOfStudy < 6;
 	}
 
 	/*
@@ -174,7 +213,11 @@ public class Assignment2 {
 	 * false otherwise.
 	 */
 	public boolean chgDept(String dcode, String newName) {
-		throw new RuntimeException("Function Not Implemented");
+		
+	  
+	  
+	  
+	  return true;
 	}
 
 	/*
