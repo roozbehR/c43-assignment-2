@@ -1,14 +1,8 @@
-
-
-//We need to remove the package cscc43A2Java later before we submit the assignment
-
-package cscc43A2Java;
-
 import java.sql.*;
 import java.util.Scanner;
+import java.io.*;
 
 public class Assignment2 {
-
 	// A connection to the database.
 	// This variable is kept public.
 	public Connection connection;
@@ -53,11 +47,41 @@ public class Assignment2 {
 	  try {
          this.connection = DriverManager.getConnection(URL, username, password);
          successful = true;
-
      } catch (SQLException e) {
          System.out.println("Error, could not connect to the db");
          e.printStackTrace();
      }
+
+	//////////////////////------------------------------------- Remove me before submission \/
+	try{
+			//Create a Statement for executing SQL queries
+			sql = connection.createStatement(); 
+			String sqlQ;
+
+
+			// Open the DDL file
+			FileInputStream fstream = new FileInputStream("a2DDL.sql");
+			BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
+			String strLine;
+			while ((strLine = br.readLine()) != null)   {
+				sql.executeUpdate(strLine);
+			}
+			fstream.close();
+
+			// Open the DATA file
+			fstream = new FileInputStream("a2DATA.sql");
+			br = new BufferedReader(new InputStreamReader(fstream));
+			while ((strLine = br.readLine()) != null)   {
+				sql.executeUpdate(strLine);
+			}
+			fstream.close();
+	} catch (Exception e) {
+		System.out.println("Error, could not connect to the db");
+        e.printStackTrace();
+	}
+	//////////////////////------------------------------------- Remove me before submission /\
+
+
 	 return successful;
 	}
 
@@ -110,7 +134,21 @@ public class Assignment2 {
 	 * string "" if the student does not exist.
 	 */
 	public String getStudentInfo(int sid) {
-		throw new RuntimeException("Function Not Implemented");
+		try {
+			String sqlQ = "SELECT sfirstname, slastname, sex, age, yearofstudy, dcode " +
+						"FROM student " +
+						"WHERE sid = ?";
+			ps = connection.prepareStatement(sqlQ);
+			ps.setInt(1, sid);
+			rs = ps.executeQuery();
+			boolean resultIsEmpty = !rs.next();
+			if (resultIsEmpty) {
+				return "";
+			}
+			return String.format("%s:%s:%s:%s:%s:%s", rs.getString("sfirstname").trim(), rs.getString("slastname").trim(), rs.getString("sex").trim(), rs.getString("age").trim(), rs.getString("yearofstudy").trim(), rs.getString("dcode").trim());
+		} catch (SQLException e) {
+			return "";
+		}
 	}
 
 	/*
