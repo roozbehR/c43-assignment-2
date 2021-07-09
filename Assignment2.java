@@ -210,7 +210,29 @@ public class Assignment2 {
 	 * Returns an empty string "" if the student does not exist.
 	 */
 	public String listCourses(int sid) {
-		throw new RuntimeException("Function Not Implemented");
+		try {
+			String sqlQ = "SELECT c.cname, c.dcode, cs.semester, cs.year, sc.grade " +
+					"FROM studentcourse sc " +
+					"INNER JOIN coursesection cs ON sc.csid = cs.csid " +
+					"INNER JOIN course c ON cs.cid = c.cid " +
+					"WHERE sc.sid = ?";
+			ps = connection.prepareStatement(sqlQ);
+			ps.setInt(1, sid);
+			rs = ps.executeQuery();
+			String result = "";
+			boolean first = true;
+
+			while(rs.next()) {
+				if (!first) {
+					result += "\n";
+				}
+				result = result + String.format("%s:%s:%s:%s:%s", rs.getString("cname").trim(), rs.getString("dcode").trim(), rs.getString("semester").trim(), rs.getString("year").trim(), rs.getString("grade").trim());
+				first = false;
+			}
+			return result;
+		} catch (SQLException e) {
+			return "";
+		}
 	}
 
 	/*
@@ -219,7 +241,18 @@ public class Assignment2 {
 	 * successful, false otherwise. Do not not allow grades to go over 100%.
 	 */
 	public boolean updateGrades(int csid) {
-		throw new RuntimeException("Function Not Implemented");
+		try {
+			String sqlQ = "UPDATE studentcourse " +
+					"SET grade = LEAST(grade + 10, 100) " +
+					"WHERE csid = ?";
+			ps = connection.prepareStatement(sqlQ);
+			ps.setInt(1, csid);
+			ps.executeUpdate();
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 	/*

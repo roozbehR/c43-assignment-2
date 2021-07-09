@@ -9,7 +9,15 @@ public class TestAssignment2 {
 
             a2.connectDB(args[0], args[1], args[2]);
 
-            System.out.println(a2.getStudentInfo(10));
+            // System.out.println(a2.listCourses(2));
+            // System.out.println(a2.updateGrades(3));
+            // System.out.println(a2.listCourses(2));
+            // System.out.println(a2.updateGrades(3));
+            // System.out.println(a2.listCourses(2));
+            // System.out.println(a2.updateGrades(3));
+            // System.out.println(a2.listCourses(2));
+            // System.out.println(a2.updateGrades(3));
+            // System.out.println(a2.listCourses(2));
         } catch (Exception ex) {
             System.out.println(ex);
         } finally {
