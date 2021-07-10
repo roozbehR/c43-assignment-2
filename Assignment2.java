@@ -213,11 +213,36 @@ public class Assignment2 {
 	 * false otherwise.
 	 */
 	public boolean chgDept(String dcode, String newName) {
-		
-	  
-	  
-	  
-	  return true;
+		String sqlQ = "UPDATE department " +
+                      "SET dname = ? " +
+                      "WHERE dcode = ?";
+		if (!doesDeptExist(dcode)) return false;
+		try {
+		  PreparedStatement st = connection.prepareStatement(sqlQ);
+		  st.setString(1, newName);
+		  st.setNString(2, dcode);
+		  st.executeUpdate();
+		} catch(SQLException e) {
+		  System.out.println(e.getMessage());
+		  return false;
+		}
+	    return true;
+	}
+	
+	private boolean doesDeptExist(String dcode) {
+      String sqlQ = "SELECT ? " +
+          "FROM department";
+      ResultSet result = null;
+      try {
+        PreparedStatement st = connection.prepareStatement(sqlQ);
+        st.setString(1, dcode);
+        result = st.executeQuery();
+        if (!result.next()) return false;
+      } catch(SQLException e) {
+        System.out.println(e.getMessage());
+        return false;
+      }
+      return true;
 	}
 
 	/*
