@@ -28,7 +28,7 @@ public class Assignment2 {
 	      Class.forName("org.postgresql.Driver");
 
 	  } catch (ClassNotFoundException e) {
-	      //Failed to load the JDBC driver
+	      // Failed to load the JDBC driver
 	      System.out.println("Error, could  not load the driver");
 	      e.printStackTrace();
 	      return;
@@ -51,37 +51,6 @@ public class Assignment2 {
          System.out.println("Error, could not connect to the db");
          e.printStackTrace();
      }
-
-	//////////////////////------------------------------------- Remove me before submission \/
-	try{
-			//Create a Statement for executing SQL queries
-			sql = connection.createStatement(); 
-			String sqlQ;
-
-
-			// Open the DDL file
-			FileInputStream fstream = new FileInputStream("a2DDL.sql");
-			BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
-			String strLine;
-			while ((strLine = br.readLine()) != null)   {
-				sql.executeUpdate(strLine);
-			}
-			fstream.close();
-
-			// Open the DATA file
-			fstream = new FileInputStream("a2DATA.sql");
-			br = new BufferedReader(new InputStreamReader(fstream));
-			while ((strLine = br.readLine()) != null)   {
-				sql.executeUpdate(strLine);
-			}
-			fstream.close();
-	} catch (Exception e) {
-		System.out.println("Error, could not connect to the db");
-        e.printStackTrace();
-	}
-	//////////////////////------------------------------------- Remove me before submission /\
-
-
 	 return successful;
 	}
 
@@ -91,7 +60,6 @@ public class Assignment2 {
 	 * had no active connections.
 	 */
 	public boolean disconnectDB() {
-		boolean successful = false;
 		if (connection != null) {
 			try  {
 				this.connection.close();
@@ -116,46 +84,48 @@ public class Assignment2 {
 	 */
 	public boolean insertStudent(int sid, String lastName, String firstName,
 			String sex, int age, String dcode, int yearOfStudy) {
-	  if (!isStudentAttrValid(dcode, sex, yearOfStudy)) return false;
-	  
-	   String sqlQ = "INSERT INTO student VALUES (?,?,?,?,?,?,?)";
-	   PreparedStatement st = null;
+	  	if (!isStudentAttrValid(sid, dcode, sex, yearOfStudy)) return false;
+	  	String sqlQ = "INSERT INTO student VALUES (?,?,?,?,?,?,?)";
 	   
-	   try {
-	     st = connection.prepareStatement(sqlQ);
-	     st.setInt(1, sid);
-	     st.setNString(2, lastName);
-	     st.setNString(3, firstName);
-	     st.setNString(4, sex);
-	     st.setInt(5, age);
-	     st.setNString(6, dcode);
-	     st.setInt(7, yearOfStudy);
-	     st.executeUpdate();
-	   } catch(SQLException e) {
-	     System.out.println(e.getMessage());
-	     return false;
-	   }
-	   return true;
+	   	try {
+			ps = connection.prepareStatement(sqlQ);
+			ps.setInt(1, sid);
+			ps.setString(2, lastName);
+			ps.setString(3, firstName);
+			ps.setString(4, sex);
+			ps.setInt(5, age);
+			ps.setString(6, dcode);
+			ps.setInt(7, yearOfStudy);
+			ps.executeUpdate();
+	   	} catch(SQLException e) {
+	     	e.printStackTrace();
+	     	return false;
+		}	
+	   	return true;
 	}
 	
-	private boolean isStudentAttrValid(String dcode, String sex, int yearOfStudy) {
-	  String sqlQ = "SELECT dcode FROM department", dcodeInDB = "";
-      PreparedStatement st = null;
-      ResultSet result = null;
-      
-	  try {
-	    st = connection.prepareStatement(sqlQ);
-	    result = st.executeQuery();
-	    while(result.next()) {
-	      String curr = result.getString("dcode");
-	      if (curr.equals(dcode)) dcodeInDB = curr;
-	    }
-	  } catch(SQLException e) {
-	    System.out.println(e.getMessage());
-	    return false;
+	private boolean isStudentAttrValid(int sid, String dcode, String sex, int yearOfStudy) {
+		try {
+			String sqlQ = "SELECT sid FROM student WHERE sid = ?";
+			ps = connection.prepareStatement(sqlQ);
+			ps.setInt(1, sid);
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				return false;
+			}
+
+			sqlQ = "SELECT dcode FROM department WHERE dcode = ?";
+	    	ps = connection.prepareStatement(sqlQ);
+			ps.setString(1, dcode);
+			rs = ps.executeQuery();
+	    	if (!rs.next()) {
+				return false;
+			}
+	  	} catch(SQLException e) {
+			e.printStackTrace();
+			return false;
 	  }
-	  return dcodeInDB.equals(dcode) && (sex.equals("M") || sex.equals("F")) && 
-	      yearOfStudy > 0 && yearOfStudy < 6;
+		return (sex.equals("M") || sex.equals("F")) && yearOfStudy > 0 && yearOfStudy < 6;
 	}
 
 	/*
@@ -164,22 +134,27 @@ public class Assignment2 {
 	 */
 	public int getStudentsCount(String dname) {
         int answer = 0;
-        PreparedStatement st=null;
-        ResultSet result = null;
-        String query = "";
-        
+
 		try {
-			query = "SELECT count(sid) FROM student, department WHERE student.dcode = department.dcode AND department.dname=?";
-	   		st = connection.prepareStatement(query);
-	   		st.setString(1, dname);		
-	   		result = st.executeQuery();
-	   		while(result.next()) {
-	   			answer = result.getInt("count");
+			String sqlQ = "SELECT dcode FROM department WHERE dname = ?";
+			ps = connection.prepareStatement(sqlQ);
+	   		ps.setString(1, dname);
+			rs = ps.executeQuery();
+			if (!rs.next()) {
+				return -1;
+			}
+			String dcode = rs.getString("dcode");
+
+			sqlQ = "SELECT count(sid) FROM student WHERE dcode = ?";
+	   		ps = connection.prepareStatement(sqlQ);
+	   		ps.setString(1, dcode);		
+	   		rs = ps.executeQuery();
+	   		if (rs.next()) {
+	   			answer = rs.getInt("count");
 	   		}
 	   		return answer;
-    	   
        }catch(SQLException e) {
-    	   System.out.println(e.getMessage());
+    	   e.printStackTrace();
     	   return -1;
        }
 	}
@@ -218,31 +193,28 @@ public class Assignment2 {
                       "WHERE dcode = ?";
 		if (!doesDeptExist(dcode)) return false;
 		try {
-		  PreparedStatement st = connection.prepareStatement(sqlQ);
-		  st.setString(1, newName);
-		  st.setNString(2, dcode);
-		  st.executeUpdate();
+			ps = connection.prepareStatement(sqlQ);
+			ps.setString(1, newName);
+		  	ps.setString(2, dcode);
+		  	ps.executeUpdate();
 		} catch(SQLException e) {
-		  System.out.println(e.getMessage());
-		  return false;
+		  	e.printStackTrace();
+		  	return false;
 		}
 	    return true;
 	}
 	
 	private boolean doesDeptExist(String dcode) {
-      String sqlQ = "SELECT ? " +
-          "FROM department";
-      ResultSet result = null;
-      try {
-        PreparedStatement st = connection.prepareStatement(sqlQ);
-        st.setString(1, dcode);
-        result = st.executeQuery();
-        if (!result.next()) return false;
-      } catch(SQLException e) {
-        System.out.println(e.getMessage());
-        return false;
-      }
-      return true;
+	      String sqlQ = "SELECT dcode FROM department WHERE dcode = ?";
+      	try {
+        	ps = connection.prepareStatement(sqlQ);
+	        ps.setString(1, dcode);
+        	rs = ps.executeQuery();
+        	return rs.next();
+      	} catch(SQLException e) {
+	        System.out.println(e.getMessage());
+        	return false;
+      	}
 	}
 
 	/*
@@ -250,20 +222,14 @@ public class Assignment2 {
 	 * otherwise.
 	 */
 	public boolean deleteDept(String dcode) {
-        PreparedStatement st=null;
-        String query = "";
-        
-		try {
-			query = "DELETE FROM department WHERE dcode=?";
-	   		st = connection.prepareStatement(query);
-	   		st.setString(1, dcode);		
-	   		int rowsAffected = st.executeUpdate();
-	   		if(rowsAffected == 0) {
-	   			return false;
-	   		}
-			return true;
-		}catch(SQLException e) {
-			System.out.println(e.getMessage());
+        try {
+			String sqlQ = "DELETE FROM department WHERE dcode = ?";
+	   		ps = connection.prepareStatement(sqlQ);
+	   		ps.setString(1, dcode);	
+	   		int rowsAffected = ps.executeUpdate();
+	   		return rowsAffected > 0;
+		}catch (SQLException e) {
+			e.printStackTrace();
 			return false;
 		}
 	}
@@ -336,48 +302,37 @@ public class Assignment2 {
 	 * true if the database was successfully created, false otherwise.
 	 */
 	public boolean updateDB() {
-		PreparedStatement st=null;
-        String query = "";
-        String query1 = "";
-		ResultSet result = null;
-		
-        try {
-			query1="SELECT sid, sfirstname, slastname "
+		try {
+			String sqlQ = "SELECT sid, sfirstname, slastname "
 					+ "FROM student, department "
 					+ "WHERE student.dcode = department.dcode AND "
-					+ "sex=? AND dname=? AND yearofstudy=?";
-	   		st = connection.prepareStatement(query1);
-	   		st.setString(1, "F");	
-	   		st.setString(2, "Computer Science");
-	   		st.setInt(3, 8);
-	   		result = st.executeQuery();
+					+ "sex = ? AND dname = ? AND yearofstudy = ?";
+	   		ps = connection.prepareStatement(sqlQ);
+	   		ps.setString(1, "F");	
+	   		ps.setString(2, "Computer Science");
+	   		ps.setInt(3, 4);
+	   		rs = ps.executeQuery();
 	   		
-			query = "CREATE TABLE femaleStudents(sid INTEGER, fname CHAR(20), lname CHAR(20)"
+			sqlQ = "CREATE TABLE femaleStudents(sid INTEGER, fname CHAR(20), lname CHAR(20)"
 					+ ")";
-	   		st = connection.prepareStatement(query);
-	   		int returnval = st.executeUpdate();
+	   		ps = connection.prepareStatement(sqlQ);
+	   		ps.executeUpdate();
 	   		
-	   		while(result.next()) {
-	   			System.out.println("Sid: "+ result.getInt("sid")+" Fname: "+ result.getString("sfirstname"));
-	   			query = "INSERT INTO femaleStudents VALUES (?, ?, ?)";
-	   			st = connection.prepareStatement(query);
-		   		st.setInt(1, result.getInt("sid"));
-		   		st.setString(2, result.getString("sfirstname"));
-		   		st.setString(3, result.getString("slastname"));
-	   			int inserted = st.executeUpdate();
-	   			if(inserted != 1) {
+	   		while(rs.next()) {
+	   			sqlQ = "INSERT INTO femaleStudents VALUES (?, ?, ?)";
+	   			ps = connection.prepareStatement(sqlQ);
+		   		ps.setInt(1, rs.getInt("sid"));
+		   		ps.setString(2, rs.getString("sfirstname").trim());
+		   		ps.setString(3, rs.getString("slastname").trim());
+	   			int inserted = ps.executeUpdate();
+	   			if (inserted != 1) {
 	   				return false;
 	   			}
 	   		}
 	   		return true;
-	   		
-		}catch(SQLException e) {
-			System.out.println(e.getMessage());
+		} catch (SQLException e) {
+			e.printStackTrace();
 			return false;
 		}
-	}
-	
-	public static void main(String[] args) {
-	  Assignment2 as2 = new Assignment2();
 	}
 }
