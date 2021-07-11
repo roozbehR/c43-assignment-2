@@ -32,13 +32,12 @@ AND yearofstudy=4 and dname= 'Computer Science' AND sex='F');
 
 --Create view for the total enrolment of the CSC department corressponding to each year between the years 2016 and 2020 inclusive
 CREATE VIEW totalenr AS (SELECT year, COUNT(*) AS enrnum
-FROM coursesection cs INNER JOIN studentCourse sc
-    ON cs.csid = sc.csid
-WHERE year >= 2016 AND year <= 2020 AND dcode = 'CSC' 
+FROM coursesection cs, studentCourse sc, department d
+WHERE cs.csid=sc.csid AND cs.dcode=d.dcode AND year >= 2016 AND year <= 2020 AND dname = 'Computer Science'
 GROUP BY year);
 
 --Inserting the answer to the query3 table
-INSERT INTO query3 (SELECT year
+INSERT INTO query3 (SELECT year, enrnum AS enrollment
 FROM totalenr
 WHERE enrnum IN
 (SELECT MAX(enrnum) FROM totalenr));
@@ -51,10 +50,8 @@ DROP VIEW totalenr;
 -- Create a view for all CS course sections
 CREATE VIEW cscoursesections AS (
     SELECT DISTINCT cname, semester
-    FROM coursesection cs
-    INNER JOIN course c
-    ON c.cid = cs.cid
-    WHERE c.dcode = 'CSC'
+    FROM coursesection cs, course c, department d
+    WHERE cs.cid=c.cid AND cs.dcode=d.dcode AND dname='Computer Science'
 );
 
 -- Insert into query 4 all CS courses taught in Summer minus all courses NOT (yes, Roozbeh, NOT...) taught in summer
