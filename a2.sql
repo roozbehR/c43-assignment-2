@@ -23,9 +23,10 @@ DROP VIEW departmentWithTotalIns;
 
 --Query 2
 
-INSERT INTO query2 (SELECT count(sid) AS num
-FROM student
-WHERE sex = 'F' AND dcode = 'CSC' AND yearofstudy = 4);
+INSERT INTO query2 (SELECT count(sid) AS num 
+FROM student, department 
+WHERE student.dcode=department.dcode 
+AND yearofstudy=4 and dname= 'Computer Science' AND sex='F');
 
 --Query 3
 
