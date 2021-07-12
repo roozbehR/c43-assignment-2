@@ -39,7 +39,7 @@ WHERE cs.csid=sc.csid AND cs.dcode=d.dcode AND year >= 2016 AND year <= 2020 AND
 GROUP BY year);
 
 --Inserting the answer to the query3 table
-CREATE TABLE query3 (num year INTEGER, enrollment INTEGER);
+CREATE TABLE query3 (year INTEGER, enrollment INTEGER);
 INSERT INTO query3 (SELECT year, enrnum AS enrollment
 FROM totalenr
 WHERE enrnum IN
