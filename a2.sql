@@ -111,37 +111,14 @@ INSERT INTO query5 (
     ON s.sid = sgi.sid
 );
 
---Make a view for max average in each department
--- CREATE VIEW deptmaxavg AS (
---     SELECT s.sid, sg2.dcode, sg2.avg
---     FROM studentgrd sg
---     INNER JOIN student s
---     ON s.sid = sg.sid
---     INNER JOIN (
---         SELECT dcode, MAX(avg) AS avg
---         FROM studentgrd sg
---         INNER JOIN student s
---         ON sg.sid = s.sid
---         GROUP BY dcode
---     ) sg2
---     ON sg.avg = sg2.avg AND s.dcode = sg2.dcode
--- );
-
---Inserting the answer into the query5 table
--- INSERT INTO query5 (
---         SELECT dname AS dept, s.sid AS sid, sfirstname, slastname, avg as avgGrade
---         FROM deptmaxavg dma
---         INNER JOIN student s
---         ON dma.sid = s.sid
---         INNER JOIN department d
---         ON s.dcode = d.dcode
--- );
-
 --Dropping the view that we created above
-DROP VIEW currentc;
-DROP VIEW studentgrd;
-DROP VIEW studentGradeInfo;
 DROP VIEW deptmaxavg;
+DROP VIEW studentGradeInfo;
+DROP VIEW studentgrd;
+DROP VIEW currentc;
+
+
+
 
 --Query 6
 
@@ -194,11 +171,11 @@ INSERT INTO query6 (
     ON scpt.dcode = c.dcode AND scpt.cid = c.cid
 );
 
-DROP VIEW coursesectionstaken;
-DROP VIEW studentscourseprereqs;
-DROP VIEW studentscourseprereqscount;
-DROP VIEW studentscourseprereqstakencount;
 DROP VIEW studentcourseswithprereqstaken;
+DROP VIEW studentscourseprereqstakencount;
+DROP VIEW studentscourseprereqscount;
+DROP VIEW studentscourseprereqs;
+DROP VIEW coursesectionstaken;
 
 --Query 7
 
