@@ -101,7 +101,7 @@ CREATE VIEW deptmaxavg AS (
 );
 
 INSERT INTO query5 (
-    SELECT dname AS dept, sgi.sid, sfirstname, slastname, avg AS avgGrade
+    SELECT dname AS dept, sgi.sid, sfirstname, slastname, sgi.avg AS avgGrade
     FROM studentGradeInfo sgi
     INNER JOIN deptmaxavg dma
     ON sgi.dcode = dma.dcode AND sgi.avg = dma.avg
