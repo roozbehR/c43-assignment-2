@@ -7,6 +7,7 @@ SET search_path TO A2;
 --Query 1
 
 --Creating a view containing the department with the total number of their instuctors
+
 CREATE VIEW departmentWithTotalIns AS (SELECT dname, COUNT(*) AS inum
 FROM department d INNER JOIN instructor i 
     ON d.dcode = i.dcode
@@ -14,6 +15,7 @@ WHERE idegree <> 'PhD'
 GROUP BY dname);
 
 --Inserting the answer into the query1 table
+CREATE TABLE query1 (dname VARCHAR(20));
 INSERT INTO query1 (SELECT dname
 FROM departmentWithTotalIns 
 WHERE inum IN (SELECT MAX(INUM) from departmentWithTotalIns));
@@ -22,7 +24,7 @@ WHERE inum IN (SELECT MAX(INUM) from departmentWithTotalIns));
 DROP VIEW departmentWithTotalIns;
 
 --Query 2
-
+CREATE TABLE query2 (num INTEGER);
 INSERT INTO query2 (SELECT count(sid) AS num 
 FROM student, department 
 WHERE student.dcode=department.dcode 
@@ -37,6 +39,7 @@ WHERE cs.csid=sc.csid AND cs.dcode=d.dcode AND year >= 2016 AND year <= 2020 AND
 GROUP BY year);
 
 --Inserting the answer to the query3 table
+CREATE TABLE query3 (num year INTEGER, enrollment INTEGER);
 INSERT INTO query3 (SELECT year, enrnum AS enrollment
 FROM totalenr
 WHERE enrnum IN
@@ -55,6 +58,7 @@ CREATE VIEW cscoursesections AS (
 );
 
 -- Insert into query 4 all CS courses taught in Summer minus all courses NOT (yes, Roozbeh, NOT...) taught in summer
+CREATE TABLE query4 (cname VARCHAR(20));
 INSERT INTO query4 (
     (SELECT cname
      FROM cscoursesections
@@ -100,6 +104,7 @@ CREATE VIEW deptmaxavg AS (
     GROUP BY dcode
 );
 
+CREATE TABLE query5 (dept VARCHAR(20), sid INTEGER, sfirstname VARCHAR(20), slastname VARCHAR(20), avgGrade FLOAT);
 INSERT INTO query5 (
     SELECT dname AS dept, sgi.sid, sfirstname, slastname, sgi.avg AS avgGrade
     FROM studentGradeInfo sgi
@@ -162,6 +167,7 @@ CREATE VIEW studentcourseswithprereqstaken AS (
     (SELECT * FROM studentscourseprereqstakencount)
 );
 
+CREATE TABLE query6 (fname VARCHAR(20), lname VARCHAR(20), cname VARCHAR(20), year INTEGER, semester INTEGER);
 INSERT INTO query6 (
     SELECT s.sfirstname AS fname, s.slastname AS lname, c.cname, scpt.year, scpt.semester
     FROM studentcourseswithprereqstaken scpt
@@ -195,6 +201,7 @@ FROM validCsCourse vc INNER JOIN studentCourse sc
 GROUP BY cid, vc.csid);
 
 --Inserting the answer into query7 table
+CREATE TABLE query7 (cname VARCHAR(20), semester INTEGER, year INTEGER, avgmark FLOAT);
 INSERT INTO query7 (SELECT cname, semester, year, avgmark
 FROM validCsCourseInfo vci INNER JOIN courseSection cs 
         ON vci.csid = cs.csid AND vci.cid = cs.cid
