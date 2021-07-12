@@ -181,7 +181,7 @@ CREATE VIEW studentscourseprereqstakencount AS (
 -- Get the student courses taken with prerequisite count equal to number of prerequisites completed count
 CREATE VIEW studentcourseswithprereqstaken AS (
     (SELECT * FROM studentscourseprereqscount)
-    INTERSECT
+    EXCEPT
     (SELECT * FROM studentscourseprereqstakencount)
 );
 
