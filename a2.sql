@@ -205,7 +205,9 @@ DROP VIEW studentcourseswithprereqstaken;
 --Creating a view for the courses belonging to CS department and with at least 3 students enrolled on them
 CREATE VIEW validCsCourse AS (SELECT cid, sc.csid AS csid FROM courseSection cs INNER JOIN studentCourse sc
     ON cs.csid = sc.csid
-WHERE dcode = 'CSC'
+    INNER JOIN department d
+    ON d.dcode = cs.dcode 
+WHERE dname = 'Computer Science'
 GROUP BY cid, sc.csid
 HAVING COUNT(DISTINCT sid) >= 3);
 
@@ -223,3 +225,5 @@ FROM validCsCourseInfo vci INNER JOIN courseSection cs
         ON  c.cid = cs.cid
 WHERE avgmark = (SELECT MIN(avgmark) AS avgmark FROM validCsCourseInfo) OR avgmark = (SELECT MAX(avgmark) AS avgmark FROM validCsCourseInfo));
 
+DROP VIEW validCsCourseInfo;
+DROP VIEW validCsCourse;
