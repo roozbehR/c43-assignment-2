@@ -104,7 +104,7 @@ CREATE VIEW deptmaxavg AS (
     GROUP BY dcode
 );
 
-CREATE TABLE query5 (dept VARCHAR(20), sid INTEGER, sfirstname VARCHAR(20), slastname VARCHAR(20), avgGrade FLOAT);
+CREATE TABLE query5 (dept VARCHAR(20), sid INTEGER, sfirstname VARCHAR(20), slastname VARCHAR(20), avgGrade NUMERIC);
 INSERT INTO query5 (
     SELECT dname AS dept, sgi.sid, sfirstname, slastname, sgi.avg AS avgGrade
     FROM studentGradeInfo sgi
@@ -201,7 +201,7 @@ FROM validCsCourse vc INNER JOIN studentCourse sc
 GROUP BY cid, vc.csid);
 
 --Inserting the answer into query7 table
-CREATE TABLE query7 (cname VARCHAR(20), semester INTEGER, year INTEGER, avgmark FLOAT);
+CREATE TABLE query7 (cname VARCHAR(20), semester INTEGER, year INTEGER, avgmark NUMERIC);
 INSERT INTO query7 (SELECT cname, semester, year, avgmark
 FROM validCsCourseInfo vci INNER JOIN courseSection cs 
         ON vci.csid = cs.csid AND vci.cid = cs.cid
