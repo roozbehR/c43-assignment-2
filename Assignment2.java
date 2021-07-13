@@ -177,7 +177,7 @@ public class Assignment2 {
 			if (resultIsEmpty) {
 				return "";
 			}
-			return String.format("%s:%s:%s:%s:%s:%s", rs.getString("sfirstname").trim(), rs.getString("slastname").trim(), rs.getString("sex").trim(), rs.getString("age").trim(), rs.getString("yearofstudy").trim(), rs.getString("dcode").trim());
+			return String.format("%s:%s:%s:%s:%s:%s", rs.getString("sfirstname"), rs.getString("slastname"), rs.getString("sex"), rs.getString("age"), rs.getString("yearofstudy"), rs.getString("dcode"));
 		} catch (SQLException e) {
 			return "";
 		}
@@ -260,7 +260,7 @@ public class Assignment2 {
 				if (!first) {
 					result += "\n";
 				}
-				result = result + String.format("%s:%s:%s:%s:%s", rs.getString("cname").trim(), rs.getString("dcode").trim(), rs.getString("semester").trim(), rs.getString("year").trim(), rs.getString("grade").trim());
+				result = result + String.format("%s:%s:%s:%s:%s", rs.getString("cname"), rs.getString("dcode"), rs.getString("semester"), rs.getString("year"), rs.getString("grade"));
 				first = false;
 			}
 			return result;
@@ -322,8 +322,8 @@ public class Assignment2 {
 	   			sqlQ = "INSERT INTO femaleStudents VALUES (?, ?, ?)";
 	   			ps = connection.prepareStatement(sqlQ);
 		   		ps.setInt(1, rs.getInt("sid"));
-		   		ps.setString(2, rs.getString("sfirstname").trim());
-		   		ps.setString(3, rs.getString("slastname").trim());
+		   		ps.setString(2, rs.getString("sfirstname"));
+		   		ps.setString(3, rs.getString("slastname"));
 	   			int inserted = ps.executeUpdate();
 	   			if (inserted != 1) {
 	   				return false;
